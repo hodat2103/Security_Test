@@ -13,7 +13,7 @@ import org.springframework.stereotype.Repository;
 import java.math.BigDecimal;
 
 @Repository
-public interface CourseRepository extends JpaRepository<Course, Integer> {
+public interface CourseRepository extends JpaRepository<Course, Long> {
 
     @Query("SELECT c FROM Course c WHERE " +
             "(:categoryId IS NULL OR :categoryId = 0 OR c.category.id = :categoryId)" +
@@ -21,20 +21,20 @@ public interface CourseRepository extends JpaRepository<Course, Integer> {
             "AND (:instructorId IS NULL OR :instructorId = 0 OR c.instructor.id = :instructorId)" +
             "AND (:keyword IS NULL OR :keyword = '' OR c.title LIKE %:keyword%)")
     Page<Course> searchCourses(
-            @Param("categoryId") Integer categoryId,
-            @Param("languageId") Integer languageId,
-            @Param("instructorId") Integer instructorId,
+            @Param("categoryId") Long categoryId,
+            @Param("languageId") Long languageId,
+            @Param("instructorId") Long instructorId,
             @Param("keyword") String keyword, Pageable pageable
     );
 
 
     @Procedure(procedureName = "insert_course")
-    Integer insertCourse(
+    Long insertCourse(
             @Param("p_title") String title,
             @Param("p_description") String description,
             @Param("p_price") BigDecimal price,
-            @Param("p_categoryId") int categoryId,
-            @Param("p_languageId") int languageId,
-            @Param("p_instructorId") int instructorId);
+            @Param("p_categoryId") Long categoryId,
+            @Param("p_languageId") Long languageId,
+            @Param("p_instructorId") Long instructorId);
 
 }

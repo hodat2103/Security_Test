@@ -22,7 +22,7 @@ public class Language {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "language_id")
-    private int id;
+    private Long id;
 
     //ten ngon ngu duoc su dung trong 1 khoa hoc ex(Java , Php, Nodejs, Reactjs,...)
     @Column(name = "name")

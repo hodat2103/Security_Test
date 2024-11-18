@@ -14,7 +14,7 @@ public class CourseVideoRequestDTO {
 
     @Min(value = 1, message = "Course ID must be a positive integer")
     @JsonProperty("course_id")
-    private int courseId;
+    private Long courseId;
 
     @NotBlank(message = "Video url must not be blank")
     @JsonProperty("video_url")

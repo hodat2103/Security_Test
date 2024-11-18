@@ -34,13 +34,13 @@ public class CourseRequestDTO {
 
     @Min(value = 1, message = "Category ID must be a positive integer")
     @JsonProperty("category_id")
-    private int categoryId;
+    private Long categoryId;
 
     @Min(value = 1, message = "Language ID must be a positive integer")
     @JsonProperty("language_id")
-    private int languageId;
+    private Long languageId;
 
     @Min(value = 1, message = "Instructor ID must be a positive integer")
     @JsonProperty("instructor_id")
-    private int instructorId;
+    private Long instructorId;
 }

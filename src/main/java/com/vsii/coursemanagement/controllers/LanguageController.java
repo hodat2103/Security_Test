@@ -1,10 +1,12 @@
 package com.vsii.coursemanagement.controllers;
 
 
-import com.vsii.coursemanagement.dtos.response.ResponseError;
+import com.vsii.coursemanagement.components.Translator;
 import com.vsii.coursemanagement.dtos.response.ResponseSuccess;
-import com.vsii.coursemanagement.services.IInstructorService;
+import com.vsii.coursemanagement.entities.Language;
+import com.vsii.coursemanagement.exceptions.DataNotFoundException;
 import com.vsii.coursemanagement.services.ILanguageService;
+import com.vsii.coursemanagement.utils.MessageKey;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -13,10 +15,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 /**
  * LanguageController bo dieu khien de xu ly cac van de lien quan den api cua quan ly ngon ngu su dung trong khoa hoc.
@@ -43,24 +46,18 @@ public class LanguageController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @GetMapping("")
-    public ResponseEntity<?> getAllLanguages(){
-        try {
-            ResponseSuccess response = languageService.getAllLanguages();
+    public ResponseEntity<?> getAllLanguages() throws DataNotFoundException {
+        List<Language> languages = languageService.getAllLanguages();
 
-            if (response.getStatusCode() == HttpStatus.NO_CONTENT) {
-                // log ra va tra ve 204 neu du lieu danh sach rong
-                log.warn("No languages found (status 204). Returning empty response.");
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(response);
-            }
+        ResponseSuccess response = new ResponseSuccess(
+                HttpStatus.OK,
+                Translator.toLocale(MessageKey.LANGUAGES_RETRIEVE_SUCCESSFULLY),
+                languages
+        );
 
-            // tra ve 200 ok neu du lieu danh sach co san
-            return ResponseEntity.ok(response);
+        // tra ve 200 ok neu du lieu danh sach co san
+        return ResponseEntity.ok(response);
 
-        } catch (RuntimeException e) {
-            // log ra exception va tra ve loi 500 phia server
-            log.error("Error retrieving languges: {}", e.getMessage(), e);
-            ResponseError errorResponse = new ResponseError(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Server error occurred while fetching categories.");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
-        }
+
     }
 }

@@ -19,7 +19,7 @@ public class CourseVideo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "video_id")
-    private int id;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnore

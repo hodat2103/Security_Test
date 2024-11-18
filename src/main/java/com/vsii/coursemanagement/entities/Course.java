@@ -25,7 +25,7 @@ public class Course extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "course_id")
-    private int id;
+    private Long id;
 
     @Column(name = "title")
     private String title; // tieu de cua khoa hoc

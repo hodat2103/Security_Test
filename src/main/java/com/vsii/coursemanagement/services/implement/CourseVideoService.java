@@ -28,16 +28,14 @@ public class CourseVideoService implements ICourseVideoService {
      * @return tra ve url video neu thanh cong, that bai nem ra exception
      */
     @Override
-    public String getByCourseId(int courseId) {
-        try {
-            CourseVideo existCourseVideo = courseVideoRepository.getByCourseId(courseId);
-            if(existCourseVideo == null){
-                throw new DataNotFoundException("Not found course video by course id " + courseId);
-            }
-            return getVideoUrlFromCloudinary(existCourseVideo.getVideoUrl());
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+    public String getByCourseId(Long courseId) throws Exception {
+
+        CourseVideo existCourseVideo = courseVideoRepository.getByCourseId(courseId);
+        if (existCourseVideo == null) {
+            throw new DataNotFoundException("Not found course video by course id " + courseId);
         }
+        return getVideoUrlFromCloudinary(existCourseVideo.getVideoUrl());
+
     }
 
     /**

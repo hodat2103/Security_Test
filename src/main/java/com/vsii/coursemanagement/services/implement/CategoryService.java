@@ -1,17 +1,16 @@
 package com.vsii.coursemanagement.services.implement;
 
-import com.vsii.coursemanagement.configurations.Translator;
-import com.vsii.coursemanagement.dtos.response.ResponseSuccess;
+import com.vsii.coursemanagement.components.Translator;
 import com.vsii.coursemanagement.entities.Category;
+import com.vsii.coursemanagement.exceptions.DataNotFoundException;
 import com.vsii.coursemanagement.repositories.CategoryRepository;
 import com.vsii.coursemanagement.services.ICategoryService;
 import com.vsii.coursemanagement.utils.MessageKey;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
 /**
  * Service tiep nhan cac cong viec tu IService nay xu ly cac logic lien quan den category
  */
@@ -23,27 +22,19 @@ public class CategoryService implements ICategoryService {
 
     /**
      * method de lay ra tat ca cac ngon ngu trong bang du lieu category
+     *
      * @return tra ve (http code, massage or ( data)) theo ket qua tuong ung
      */
     @Override
-    public ResponseSuccess getAllCategories() {
-        try {
-            List<Category> categories = categoryRepository.findAll();
+    public List<Category> getAllCategories() throws DataNotFoundException {
+        List<Category> categories = categoryRepository.findAll();
 
-            if (categories.isEmpty()) {
-                // tra ve voi ma 204 khong co du lieu
-                return new ResponseSuccess(HttpStatus.NO_CONTENT, Translator.toLocale(MessageKey.NO_CATEGORIES_FOUND));
-            }
-
-            // tra ve danh sach co du lieu
-            return new ResponseSuccess(HttpStatus.OK, Translator.toLocale(MessageKey.CATEGORIES_RETRIEVE_SUCCESSFULLY), categories);
-
-        } catch (DataAccessException e) {
-            // nem ra loi khi loi truy cap database
-            throw new RuntimeException(Translator.toLocale(MessageKey.DATABASE_ERROR)+ e.getMessage(), e);
-        } catch (Exception e) {
-            // xu ly cac loi exception
-            throw new RuntimeException(Translator.toLocale(MessageKey.EXCEPTION_COMMON) + e.getMessage(), e);
+        if (categories.isEmpty()) {
+            // tra ve voi ma 204 khong co du lieu
+            throw new DataNotFoundException(Translator.toLocale(MessageKey.NO_CATEGORIES_FOUND));
         }
+
+        // tra ve danh sach co du lieu
+        return categories;
     }
 }

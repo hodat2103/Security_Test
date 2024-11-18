@@ -13,22 +13,22 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @Builder
 public class CourseResponse extends BaseResponse{
-    private Integer id;
+    private Long id;
 
     private String title;
 
     @JsonProperty("instructor_id")
-    private int instructorId;
+    private Long instructorId;
 
     private String description;
 
     private BigDecimal price;
 
     @JsonProperty("category_id")
-    private Integer categoryId;
+    private Long categoryId;
 
     @JsonProperty("language_id")
-    private Integer languageId;
+    private Long languageId;
 
 
     public static CourseResponse fromCourse(Course course){

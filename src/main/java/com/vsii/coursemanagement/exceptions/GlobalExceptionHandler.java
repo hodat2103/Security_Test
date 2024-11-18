@@ -1,10 +1,10 @@
 package com.vsii.coursemanagement.exceptions;
-import com.vsii.coursemanagement.configurations.Translator;
+import com.vsii.coursemanagement.components.Translator;
 import com.vsii.coursemanagement.dtos.response.ResponseError;
 import com.vsii.coursemanagement.utils.MessageKey;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -19,6 +19,7 @@ import java.util.Map;
  * redirect toi ExceptionHandler de xu ly voi tinh huong tuong ung
  * response (http code, message) tuong ung voi tung ket qua phu hop
  */
+@Slf4j
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -26,6 +27,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DataNotFoundException.class)
     public ResponseEntity<ResponseError> handleDataNotFoundException(DataNotFoundException ex) {
         ResponseError response = new ResponseError(HttpStatus.NOT_FOUND.value(), ex.getMessage());
+        log.error("Error 404 - Url not found or data failed: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
 
@@ -33,6 +35,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(InvalidParamException.class)
     public ResponseEntity<ResponseError> handleInvalidParamException(InvalidParamException ex) {
         ResponseError response = new ResponseError(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
+        log.error("Error 400 - invalid param exception{}: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
@@ -43,6 +46,8 @@ public class GlobalExceptionHandler {
         for (FieldError error : ex.getBindingResult().getFieldErrors()) {
             errors.put(error.getField(), error.getDefaultMessage());
         }
+        log.error("Error 400 method agrument not valid exception");
+
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
     }
 

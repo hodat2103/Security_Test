@@ -1,6 +1,6 @@
 package com.vsii.coursemanagement.controllers;
 
-import com.vsii.coursemanagement.configurations.Translator;
+import com.vsii.coursemanagement.components.Translator;
 import com.vsii.coursemanagement.dtos.request.CourseRequestDTO;
 import com.vsii.coursemanagement.dtos.response.ResponseSuccess;
 import com.vsii.coursemanagement.dtos.response.data.CourseResponse;
@@ -18,17 +18,17 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * CourseController bo dieu khien de xu ly cac van de lien quan den api cua quan ly khoa hoc.
@@ -58,80 +58,55 @@ public class CourseController {
     @Operation(summary = "Create a new course", description = "Send a request via this API to add a new course")
     @PostMapping("")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Successfully retrieved categories"),
-            @ApiResponse(responseCode = "404", description = "URL not found"),
-            @ApiResponse(responseCode = "400", description = "Client side error"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
-    })
-    public ResponseEntity<?> create(@RequestBody @Valid CourseRequestDTO courseRequestDTO) {
+            @ApiResponse(responseCode = "201", description = "Successfully retrieved categories"),
+            @ApiResponse(responseCode = "404", description = "URL not found while not return data or url failed"),
+            @ApiResponse(responseCode = "400", description = "Client side error while invalid  input data such as validated"),
+            @ApiResponse(responseCode = "500", description = "Internal server error while not connect with database")})
+    public ResponseEntity<?> create(@RequestBody @Valid CourseRequestDTO courseRequestDTO) throws MethodArgumentNotValidException, DataNotFoundException {
 
 
-        CourseResponse response = null;
-        try {
-            response = courseService.create(courseRequestDTO);
-            // tra ve phan hoi 204 khi tao moi 1 khoa học thanh cong
-            return ResponseEntity.ok(response);
+        CourseResponse courseResponse = courseService.create(courseRequestDTO);
 
-        } catch (DataNotFoundException e) {
-            log.error("Error 404 - Url not found or data failed: {}", e.getMessage());
-            throw new RuntimeException(e);
-        } catch (InvalidParamException e) {
-            log.error("Error 400 - invalid param exception for courseId {}: {}", e.getMessage());
-            throw new RuntimeException(e);
-        }
+        ResponseSuccess responseSuccess = new ResponseSuccess(HttpStatus.CREATED, Translator.toLocale(MessageKey.COURSE_CREATE_SUCCESSFULLY), courseResponse);
+        // tra ve phan hoi 204 khi tao moi 1 khoa học thanh cong
+        return ResponseEntity.ok(responseSuccess);
+
+
     }
 
     /**
      * Phuong thuc de upload video len cloudinary cho khoa học tuong ung qua course id
      * Dieu kien upload video: Chi 1 video duoc upload
-     * Kich thuoc video duoi 5MB
+     * Kich thuoc video duoi 100MB
      * Video upload phai dung dinh dang mp4,mov...
      *
      * @param courseId      id cua khoa hoc tuong ung de upload video.
      * @param multipartFile tep video can upload len cloudinary
      * @return tra ve ok thanh cong va message, neu that bai nem ra exception.
      */
-    @Operation(summary = "Upload video to cloudinary",
-            description = "Send a request via this API to upload video of the course to cloudinary" +
-            "Conditions: just only video file - \n" +
-                    "video size smaller then 20MB - \n" +
-                    "Video file while upload must follow format standards example(mp4, mov,...)")
+    @Operation(summary = "Upload video to cloudinary", description = "Send a request via this API to upload video of the course to cloudinary" + "Conditions: just only video file - \n" + "video size smaller then 20MB - \n" + "Video file while upload must follow format standards example(mp4, mov,...)")
     @PostMapping(value = "/uploadVideo/{course_id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved video of course"),
             @ApiResponse(responseCode = "404", description = "Not found url of data"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
-    })
-    public ResponseEntity<?> uploadFile(@PathVariable(name = "course_id") @Min(1) int courseId,
-                             @RequestPart("video") MultipartFile multipartFile) throws DataNotFoundException, IOException {
+            @ApiResponse(responseCode = "500", description = "Internal server error while not connect with database and can't access to cloudinary")})
+    public ResponseEntity<?> uploadFile(@PathVariable(name = "course_id") @Min(1) Long courseId, @RequestPart("video") MultipartFile multipartFile) throws DataNotFoundException, IOException, InvalidParamException {
 
-        try {
-            // kiem tra course id co ton tai ?
-            if (courseId <= 0) {
-                log.warn("Course ID {} is invalid or not found", courseId);
-                throw new DataNotFoundException("Not found URL or data");
-            }
 
-            // goi service de upload video
-            Map<String, Object> uploadResult = courseService.uploadFileToCloudinary(courseId, multipartFile);
-            log.info("Upload successful for courseId: {}", courseId);
+        // kiem tra course id co ton tai ?
 
-            // tra ve 200 khi upload video thanh cong
-            return ResponseEntity.ok(Translator.toLocale(MessageKey.UPLOAD_FILE_SUCCESSFULLY) + ": " + uploadResult.get("videoUrl"));
-
-        } catch (DataNotFoundException e) {
-            log.error("Error 404 - Course ID {} not found: {}", courseId, e.getMessage());
-            throw e; // // nem ra de ControllerAdvice xu ly thanh loi 404
-
-        } catch (IOException e) {
-            log.error("Error 500 - IOException occurred while uploading video for courseId {}: {}", courseId, e.getMessage());
-            throw new RuntimeException("File upload error: " + e.getMessage(), e);  // nem ra de ControllerAdvice xu ly thanh loi 500
-
-        } catch (Exception e) {
-            log.error("Error 500 - Unexpected exception for courseId {}: {}", courseId, e.getMessage());
-            throw new RuntimeException("An unexpected error occurred", e);  // nem ra de ControllerAdvice xu ly thanh loi 500
+        if (courseId <= 0) {
+            throw new DataNotFoundException("Not found URL or data");
         }
 
+        // goi service de upload video
+        Map<String, Object> uploadResult = courseService.uploadFileToCloudinary(courseId, multipartFile);
+        log.info("Upload successful for courseId: {}", courseId);
+
+        ResponseSuccess responseSuccess = new ResponseSuccess(HttpStatus.OK, Translator.toLocale(MessageKey.UPLOAD_FILE_SUCCESSFULLY), uploadResult.get("videoUrl"));
+
+        // tra ve 200 khi upload video thanh cong
+        return ResponseEntity.ok(responseSuccess);
     }
 
     /**
@@ -140,6 +115,7 @@ public class CourseController {
      *
      * @param courseId ID cua khoa hoc can lay thong tin video cua khoa hoc do.
      * @return Thông tin video hoặc null nếu không tìm thấy.
+     * @throw Exception khi khong tim thay url tren cloudinary
      */
 
     @Operation(summary = "Get a video course", description = "Retrieve a video course with course id")
@@ -147,32 +123,18 @@ public class CourseController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved video of course"),
             @ApiResponse(responseCode = "404", description = "Not found url of data"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
-    })
-    public ResponseEntity<?> getById(@PathVariable("course_id") int courseId) {
-        try {
+            @ApiResponse(responseCode = "500", description = "Internal server error while not connect with database, can't access to cloudinary ")})
+    public ResponseEntity<?> getById(@PathVariable("course_id") Long courseId) throws Exception {
 
-            // lay thong tin video khoa hoc theo ID
-            String videoUrl = courseVideoService.getByCourseId(courseId);
+        // lay thong tin video khoa hoc theo ID
+        String videoUrl = courseVideoService.getByCourseId(courseId);
 
-            // kiem tra neu video url khong ton tai
-            if (videoUrl == null) {
-
-                log.error("Not found video with course ID: " + courseId);
-                throw new DataNotFoundException("Video not found for course ID: " + courseId);
-
-            }
-            // tra ve ma code 200
-            return ResponseEntity.ok(videoUrl);
-
-        } catch (DataNotFoundException e) {
-            log.error("Data not found: {}", e.getMessage(), e);
-            throw new RuntimeException();
-        } catch (Exception e) {
-            // Log loi nem ngoai le chung GlobalException xu ly
-            log.error("An error occurred while retrieving video information: {}", e.getMessage(), e);
-            throw e;
+        // kiem tra neu video url khong ton tai
+        if (videoUrl == null) {
+            throw new DataNotFoundException("Video not found  course ID: " + courseId);
         }
+        // tra ve ma code 200
+        return ResponseEntity.ok(videoUrl);
     }
 
     /**
@@ -184,8 +146,9 @@ public class CourseController {
      * @param languageId id cua ngon ngu duoc su dung trong khoa hoc.
      * @param page       so trang ma truy van duoc mac dinh la 0
      * @param size       kich thuoc gioi han cho moi trang (mac dinh la 5).
-     *                   {@BidingResult}   dung de kiem tra cac loi tu validation
+     *                   {@BindingResult} dung de kiem tra cac loi tu validation
      * @return ResponseEntity<ResponseSuccess> response (http code, massage, data) theo ket qua phu hop.
+     * @throw DataNotFoundException khi sai url hoac khong tra ve du lieu tu database
      */
 
     @Operation(summary = "Get all courses", description = "Retrieve all courses with optional filters and pagination")
@@ -193,48 +156,27 @@ public class CourseController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved categories"),
             @ApiResponse(responseCode = "204", description = "No courses found"),
-            @ApiResponse(responseCode = "400", description = "Client side error"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
+            @ApiResponse(responseCode = "400", description = "Client side error while client enter invalid data such as the format"),
+            @ApiResponse(responseCode = "500", description = "Internal server error while not connect with database")
     })
     public ResponseEntity<?> getAllCourses(
             @RequestParam(value = "keyword", required = false) String keyword,
-            @RequestParam(value = "categoryId", required = false) @Min(1) Integer categoryId,
-            @RequestParam(value = "languageId", required = false) @Min(1) Integer languageId,
-            @RequestParam(value = "instructorId", required = false) @Min(1) Integer instructorId,
+            @RequestParam(value = "categoryId", required = false) @Min(1) Long categoryId,
+            @RequestParam(value = "languageId", required = false) @Min(1) Long languageId,
+            @RequestParam(value = "instructorId", required = false) @Min(1) Long instructorId,
             @RequestParam(value = "page", defaultValue = "0") @Min(0) int page,
-            @RequestParam(value = "size", defaultValue = "5") @Min(1) @Max(15) int size,
-            BindingResult bindingResult) {
+            @RequestParam(value = "size", defaultValue = "5") @Min(1) @Max(15) int size) throws DataNotFoundException {
 
-        if (bindingResult.hasErrors()) {
-
-            // lay tat ca cac loi tu bindingResult chuyen thanh dang chuoi field: message roi merger lai
-            String errorMessage = bindingResult.getFieldErrors().stream()
-                    .map(fieldError -> fieldError.getField() + ": " + fieldError.getDefaultMessage())
-                    .collect(Collectors.joining(", "));
-
-            //log va tra ve loi 400 du lieu tu phia client
-            log.error("Error validate data from client: {}", errorMessage);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Validation failed: " + errorMessage);
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Page<CourseResponse> courseResponses = courseService.getAllCourses(keyword, categoryId, languageId, instructorId, pageRequest);
+        int totalPage = courseResponses.getTotalPages();
+        if(totalPage == 0){
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
+        ResponseSuccess responseSuccess = new ResponseSuccess(HttpStatus.OK,
+                Translator.toLocale(MessageKey.COURSE_RETRIEVE_SUCCESSFULLY ,totalPage), courseResponses);
 
-        try {
-            PageRequest pageRequest = PageRequest.of(page, size);
-
-            ResponseSuccess response = courseService.getAllCourses(keyword, categoryId, languageId,instructorId, pageRequest);
-
-            if (response.getStatusCode().value() == HttpStatus.NO_CONTENT.value()) {
-                // log ra va tra ve 204 neu du lieu danh sach rong
-                log.warn("No courses found (status 204), returning empty response.");
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(response);
-            }
-
-            // tra ve pan hoi 200 OK khi loc duoc thong tin theo yeu cau
-            return ResponseEntity.ok(response);
-
-        } catch (Exception e) {
-            // log loi ra va tra ve loi 500 phia server
-            log.error("Error retrieving courses: {}", e.getMessage(), e);
-            throw e;
-        }
+        // Return 200 OK when courses are successfully retrieved
+        return ResponseEntity.ok(responseSuccess);
     }
 }

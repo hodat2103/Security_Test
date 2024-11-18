@@ -1,8 +1,7 @@
 package com.vsii.coursemanagement.services;
 
-import com.vsii.coursemanagement.dtos.response.ResponseSuccess;
 import com.vsii.coursemanagement.entities.Language;
-import org.springframework.stereotype.Repository;
+import com.vsii.coursemanagement.exceptions.DataNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,7 +10,9 @@ import java.util.List;
 public interface ILanguageService {
     /**
      * phuong thuc nay de lay ra tat ca cac du lieu cua instructor
+     *
      * @return tra ve tat ca du lieu cua instructor
+     * @throws DataNotFoundException nem ex ra khi loi url hay gia tri rong
      */
-    ResponseSuccess getAllLanguages();
+    List<Language> getAllLanguages() throws DataNotFoundException;
 }

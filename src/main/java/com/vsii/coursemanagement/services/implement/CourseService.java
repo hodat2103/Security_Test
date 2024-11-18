@@ -2,13 +2,11 @@ package com.vsii.coursemanagement.services.implement;
 
 import com.cloudinary.utils.ObjectUtils;
 import com.vsii.coursemanagement.configurations.CloudinaryConfig;
-import com.vsii.coursemanagement.configurations.Translator;
+import com.vsii.coursemanagement.components.Translator;
 import com.vsii.coursemanagement.dtos.request.CourseRequestDTO;
-import com.vsii.coursemanagement.dtos.response.ResponseSuccess;
 import com.vsii.coursemanagement.dtos.response.data.CourseResponse;
 import com.vsii.coursemanagement.entities.*;
 import com.vsii.coursemanagement.exceptions.DataNotFoundException;
-import com.vsii.coursemanagement.exceptions.InvalidParamException;
 import com.vsii.coursemanagement.repositories.*;
 import com.vsii.coursemanagement.services.ICourseService;
 import com.vsii.coursemanagement.utils.ConstantKey;
@@ -16,7 +14,6 @@ import com.vsii.coursemanagement.utils.MessageKey;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -40,12 +37,11 @@ public class CourseService implements ICourseService {
 
     /**
      * @param courseDTO bao gom chi tiet thong tin cua khoa hoc
-     * @return
-     * @throws DataNotFoundException (category, instructor, language not found in the database)
-     * @throws InvalidParamException (khi cac param truyen vao khong hop le khi validate trong dto)
+     * @return {@link CourseResponse} tra ve thong tin khoa hoc vua tao moi
+     * @throws DataNotFoundException (category, instructor, language khong tim thay trong database hoac url sai)
      */
     @Override
-    public CourseResponse create(CourseRequestDTO courseDTO) throws DataNotFoundException, InvalidParamException {
+    public CourseResponse create(CourseRequestDTO courseDTO) throws DataNotFoundException {
 
 
             // kiem tra su ton tai cua category theo category id
@@ -63,7 +59,7 @@ public class CourseService implements ICourseService {
             // Tao mot khoa hoc moi
 
             // Call the stored procedure to insert the course and return the course ID
-            Integer courseId = courseRepository.insertCourse(
+        Long courseId = courseRepository.insertCourse(
                     courseDTO.getTitle(),
                     courseDTO.getDescription(),
                     courseDTO.getPrice(),
@@ -84,18 +80,18 @@ public class CourseService implements ICourseService {
     /**
      *
      * @param videoFile file video dang MultipartFile
-     * @throws InvalidParamException
+     * @throws IOException nem ra ex khi khong tim thay file hoac file sai dinh dang
      */
-    private void validateVideoFile(MultipartFile videoFile) throws InvalidParamException {
+    private void validateVideoFile(MultipartFile videoFile) throws IOException {
 
         if (videoFile == null || videoFile.isEmpty()) {
-            throw new InvalidParamException("You must upload exactly one non-empty video file.");
+            throw new IOException(Translator.toLocale(MessageKey.UPLOAD_FILE_EMPTY));
         }
         if (videoFile.getSize() > ConstantKey.MAX_FILE_SIZE_MB) {
-            throw new InvalidParamException("File size exceeds 100MB limit.");
+            throw new IOException(Translator.toLocale(MessageKey.UPLOAD_FILE_EXCEED_SIZE));
         }
         if (!ConstantKey.VALID_CONTENT_TYPES.contains(videoFile.getContentType())) {
-            throw new InvalidParamException("Invalid file type. Only video files are accepted (e.g., mp4, mpeg, avi, mov).");
+            throw new IOException(Translator.toLocale(MessageKey.UPLOAD_FILE_FORMAT_FAILED));
         }
     }
 
@@ -107,10 +103,10 @@ public class CourseService implements ICourseService {
      * @throws IOException
      */
     @Override
-    public Map<String, Object> uploadFileToCloudinary(Integer courseId, MultipartFile videoFile) throws InvalidParamException, DataNotFoundException, IOException {
+    public Map<String, Object> uploadFileToCloudinary(Long courseId, MultipartFile videoFile) throws  DataNotFoundException, IOException {
         Map<String, Object> uploadResult = new HashMap<>();
 
-        try {
+
             // Goi ham validate de ktra file truoc khi upload
 
             validateVideoFile(videoFile);
@@ -136,21 +132,11 @@ public class CourseService implements ICourseService {
             courseVideoRepository.save(courseVideo);
 
             uploadResult.put("videoUrl", videoUrl);
-            uploadResult.put("message", "Video uploaded successfully");
+            uploadResult.put("message", Translator.toLocale(MessageKey.UPLOAD_FILE_SUCCESSFULLY));
             return uploadResult;
-        } catch (InvalidParamException e) {
-            throw e;
-        } catch (DataNotFoundException e) {
-            throw e;
-        } catch (IOException e) {
-            throw e;
-        }
-
-
     }
 
     /**
-     *
      * @param keyword     keyword theo tieu de cua khoa hoc can tim
      * @param fieldId     The ID of the field to filter courses by.
      * @param languageId  The ID of the language to filter courses by.
@@ -158,19 +144,17 @@ public class CourseService implements ICourseService {
      * @return
      */
     @Override
-    public ResponseSuccess getAllCourses(String keyword, Integer fieldId, Integer languageId, Integer instructorId, PageRequest pageRequest) {
-        try {
+    public Page<CourseResponse> getAllCourses(String keyword, Long fieldId, Long languageId, Long instructorId, PageRequest pageRequest) throws DataNotFoundException {
+
             Page<Course> coursePage = courseRepository.searchCourses(fieldId, languageId,instructorId, keyword, pageRequest);
             Page<CourseResponse> courses = coursePage.map(CourseResponse::fromCourse);
             if (courses.isEmpty()) {
                 // tra ve voi ma 204 khong co du lieu
-                return new ResponseSuccess(HttpStatus.NO_CONTENT, Translator.toLocale(MessageKey.NO_COURSES_FOUND));
+                throw new DataNotFoundException(Translator.toLocale(MessageKey.NO_COURSES_FOUND));
             }
             // tra ve trang thai 200 khi lay tat ca hay loc thanh cong du lieu theo yeu cau
-            return new ResponseSuccess(HttpStatus.OK, "Courses retrieved successfully", courses);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to retrieve courses: " + e.getMessage(), e);
-        }
+            return courses;
+
     }
 
 

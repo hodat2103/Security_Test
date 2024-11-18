@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 /**
- *  lop entity nay la dai dien cho du lieu instructor cua he thong
+ *  Lop entity nay la dai dien cho du lieu instructor cua he thong
  *  Su dung cac annotation de toi uu code, su dung khi can den viec truy xuat hay xu ly du lieu
  */
 
@@ -23,7 +23,7 @@ public class Instructor {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "instructor_id")
-    private int id;
+    private Long id;
 
     // ten cua nguoi huong dan khoa hoc
     @Column(name = "name")

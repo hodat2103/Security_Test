@@ -1,4 +1,4 @@
-package com.vsii.coursemanagement.configurations;
+package com.vsii.coursemanagement.components;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -32,8 +32,9 @@ public class Translator {
      * @return thong diep se tra ve theo ngon ngu da chon neu khong thi return null
      * khong chon thi mac dinh se la tieng anh
      */
-    public static String toLocale(String msgCode) {
+    public static String toLocale(String msgCode, Object... args) {
         Locale locale = LocaleContextHolder.getLocale();
-        return messageSource.getMessage(msgCode, null, locale);
+        String message = messageSource.getMessage(msgCode, args, locale);
+        return message;
     }
 }

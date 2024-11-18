@@ -36,21 +36,23 @@ openapi:
     title: API Service
     version: 1.0.0
 
-    messages:
-      always-use-message-format: false
-      basename: i18n/messages
-      cache-seconds: 3600
-      encoding: UTF-8
-      default-locale: en
-      fallback-to-system-locale: true
-    main:
-      allow-bean-definition-overriding=true:
     security:
       debug: true
     allow-circular-references: true
+    logging:
+      file:
+        name: resources/logs.application.log
+      level:
+        root: info
 
-
-
+jwt:
+  expiration: 604800
+  #7 days (s)
+  secretKey: PstJjnP30Ohm2YKW/bgvGvk80UFeylLdzcbHcH136z4=
 api:
   prefix: api/v1
 
+  logging:
+    level:
+      org.springframework.security: DEBUG
+      logging.level.com.project.CourseSellingWeb.filters.JwtTokenFilter: DEBUG

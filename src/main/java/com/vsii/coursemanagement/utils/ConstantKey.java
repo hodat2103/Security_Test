@@ -9,5 +9,5 @@ import java.util.List;
 
 public class ConstantKey {
     public static final List<String> VALID_CONTENT_TYPES = Arrays.asList("video/mp4", "video/mpeg", "video/avi", "video/quicktime");
-    public static final long MAX_FILE_SIZE_MB = 50 * 1024 * 1024; // 50MB max size
+    public static final long MAX_FILE_SIZE_MB = 100 * 1024 * 1024; // 100MB max size
 }
