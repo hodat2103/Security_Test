@@ -19,11 +19,11 @@ public class SecurityConfig {
     private final AccountRepository accountRepository;
     @Bean
     public UserDetailsService userDetailsService(){
-        return username ->  accountRepository
-                .findByUsername(username)
+        return phoneNumber ->  accountRepository
+                .findByPhoneNumber(phoneNumber)
                 .orElseThrow(() ->
                         new UsernameNotFoundException(
-                                "Cannot find account with username = " + username));
+                                "Cannot find account with phone number = " + phoneNumber));
 
     }
     @Bean

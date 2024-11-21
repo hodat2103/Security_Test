@@ -44,10 +44,10 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         }
 
         final String token = authHeader.substring(7);
-        final String username = jwtTokenUtils.extractUsername(token);
+        final String phoneNumber = jwtTokenUtils.extractUsername(token);
 
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+        if (phoneNumber != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            UserDetails userDetails = userDetailsService.loadUserByUsername(phoneNumber);
 
             if (jwtTokenUtils.validateToken(token, userDetails)) {
                 UsernamePasswordAuthenticationToken authenticationToken =
@@ -55,9 +55,9 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                 authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-                logger.debug("Authenticated user: {} with authorities: {}", username, userDetails.getAuthorities());
+                logger.debug("Authenticated user: {} with authorities: {}", phoneNumber, userDetails.getAuthorities());
             } else {
-                logger.debug("Invalid JWT token for user: {}", username);
+//                logger.debug("Invalid JWT token for user: {}", phoneNumber);
             }
         }
         filterChain.doFilter(request, response);

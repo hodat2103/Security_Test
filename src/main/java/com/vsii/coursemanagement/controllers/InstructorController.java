@@ -28,7 +28,7 @@ import java.util.List;
  */
 
 @RestController
-@RequestMapping("${api.prefix}/instructors")
+@RequestMapping("${api.prefix}instructors")
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Instructor Controller")

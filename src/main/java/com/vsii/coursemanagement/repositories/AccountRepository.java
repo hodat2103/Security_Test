@@ -10,8 +10,8 @@ import java.util.Optional;
 
 @Repository
 public interface AccountRepository extends JpaRepository<Account , Long > {
-    Boolean existsByUsername(String username);
-    Optional<Account> findByUsername(String username);
+    Boolean existsByPhoneNumber(String phoneNumber);
+    Optional<Account> findByPhoneNumber(String phoneNumber);
 
     @Query("UPDATE Account a SET a.password = :password WHERE a.id = :accountId")
     int updatePassword(@Param("password") String password, @Param("accountId") Long accountId);

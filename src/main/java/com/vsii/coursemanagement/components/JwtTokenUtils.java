@@ -29,10 +29,10 @@ public class JwtTokenUtils {
 
     @Value("${jwt.secretKey}")
     private String secretKey;
-    public String generateToken(Account account) throws InvalidParamException{
+    public String generateToken(Account account){
         Map<String, Objects> claims = new HashMap<>();
 //        this.generateSecretKey();
-        try {
+//        try {
             String token = Jwts.builder()
                     .setClaims(claims)
                     .setSubject(account.getUsername()) // authen user
@@ -41,9 +41,9 @@ public class JwtTokenUtils {
                     .signWith(getSecretInKey(), SignatureAlgorithm.HS256) //sign token bay secretKey & algorithm HS256
                     .compact();// create token by String char
             return token;
-        }catch (Exception e){
-            throw new InvalidParamException("Cannot create token because error: " + e.getMessage());
-        }
+//        }catch (Exception e){
+//            throw new InvalidParamException("Cannot create token because error: " + e.getMessage());
+//        }
 //        return null;
     }
 

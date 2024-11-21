@@ -16,6 +16,13 @@ public class Permission {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(name = "name",nullable = false, unique = true)
     private String name; // ten quyen, ex: admin:retrieve, user:retrieve
+
+    @Column(name = "end_point")
+    private String endPoint;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "http_method")
+    private HttpMethodEnum httpMethod;
 }

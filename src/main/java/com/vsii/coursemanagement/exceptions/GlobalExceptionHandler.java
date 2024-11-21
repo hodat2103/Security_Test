@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
+import java.security.GeneralSecurityException;
 import java.util.HashMap;
 import java.util.Map;
 /**
@@ -62,6 +63,18 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.PAYLOAD_TOO_LARGE)
                 .body(Translator.toLocale(MessageKey.UPLOAD_FILE_EXCEED_SIZE));
+    }
+
+    /**
+     * xu ly ngoai le voi GeneralSecurityException cho viec ma hoa, giai ma hay cac thao tac lien quan den qua trinh bao mat
+     * @param  ex GeneralSecurityException
+     * @return return ma loi 400
+     */
+    @ExceptionHandler(GeneralSecurityException.class)
+    public ResponseEntity<ResponseError> handleGeneralSecurityException(GeneralSecurityException ex) {
+        ResponseError response = new ResponseError(HttpStatus.BAD_REQUEST.value(), ex.getMessage());
+        log.error("Error 400 - Decryption failed:{}: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
     /**

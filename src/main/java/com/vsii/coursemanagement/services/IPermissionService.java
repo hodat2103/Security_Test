@@ -1,9 +1,9 @@
 package com.vsii.coursemanagement.services;
 
-import com.vsii.coursemanagement.entities.Permission;
-
-import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public interface IPermissionService {
-    public List<Permission> getAllPermissions();
+//    public List<Permission> getAllPermissions();
+    public Map<String, Map<String, Set<String>>> loadPermissions();
 }

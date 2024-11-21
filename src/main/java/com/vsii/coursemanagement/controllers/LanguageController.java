@@ -29,7 +29,7 @@ import java.util.List;
  */
 
 @RestController
-@RequestMapping("${api.prefix}/languages")
+@RequestMapping("${api.prefix}languages")
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Language Controller")

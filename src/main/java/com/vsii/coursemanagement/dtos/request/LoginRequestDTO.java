@@ -1,8 +1,11 @@
 package com.vsii.coursemanagement.dtos.request;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import org.hibernate.validator.constraints.Length;
 
 @Data
 @Builder
@@ -11,11 +14,13 @@ import lombok.*;
 @Getter
 @Setter
 public class LoginRequestDTO {
-    @NotEmpty(message = "Username cannot be empty")
-    @Size(min = 3, max = 50, message = "Username must be between 3 and 50 characters")
-    private String username;
 
-    @NotEmpty(message = "Password cannot be empty")
+    @NotBlank(message = "Phone number is required")
+    @Size(min = 10, max = 10, message = "Phone number must be exactly 10 digits")
+    @Pattern(regexp = "0\\d{9}", message = "Phone number must start with 0 and contain 10 digits")
+    private String phoneNumber;
+
+    @NotBlank(message = "Password cannot be empty")
     @Size(min = 6, max = 255, message = "Password must be between 6 and 255 characters")
     private String password;
 }

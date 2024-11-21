@@ -22,12 +22,12 @@ spring:
       fail-on-empty-beans: false
     servlet:
       multipart:
-        max-file-size: 20MB
-        max-request-size: 20MB
+        max-file-size: 100MB
+        max-request-size: 100MB
       springfox:
         documentation:
           swagger-ui:
-            url: http://localhost:8080/v1/api
+            url: http://localhost:8080/v1/api/
 
 openapi:
   service:
@@ -50,9 +50,18 @@ jwt:
   #7 days (s)
   secretKey: PstJjnP30Ohm2YKW/bgvGvk80UFeylLdzcbHcH136z4=
 api:
-  prefix: api/v1
+  prefix: api/v1/
+
+aes:
+  encryption:
+    key: this-is-test-key
+
+
+main:
+  allow-bean-definition-overriding: true
 
   logging:
     level:
       org.springframework.security: DEBUG
+      org.springframework.web: DEBUG
       logging.level.com.project.CourseSellingWeb.filters.JwtTokenFilter: DEBUG

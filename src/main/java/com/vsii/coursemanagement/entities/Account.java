@@ -1,6 +1,8 @@
 package com.vsii.coursemanagement.entities;
 
+import com.vsii.coursemanagement.configurations.AESEncryptionConfig;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -25,8 +27,13 @@ public class Account extends BaseEntity implements UserDetails, Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "username", length = 50, unique = true)
-    private String username;
+    @Column(name = "phone_number", length = 10, unique = true)
+    private String phoneNumber;
+
+    @Email
+    @Column(name = "email", length = 255, unique = true)
+    @Convert(converter = AESEncryptionConfig.class)
+    private String email;
 
     @Column(name = "password", length = 255)
     private String password;
@@ -53,7 +60,7 @@ public class Account extends BaseEntity implements UserDetails, Serializable {
 
     @Override
     public String getUsername() {
-        return username;
+        return phoneNumber;
     }
 
     @Override

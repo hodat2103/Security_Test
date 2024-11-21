@@ -1,9 +1,7 @@
 package com.vsii.coursemanagement.dtos.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.*;
 
 @Data
@@ -13,9 +11,16 @@ import lombok.*;
 @Getter
 @Setter
 public class RegisterRequestDTO {
-    @NotBlank(message = "Username is required")
-    @Size(min = 3, max = 50, message = "Username must be between 3 and 50 characters")
-    private String username;
+
+    @NotBlank(message = "Phone number is required")
+    @Size(min = 10, max = 10, message = "Phone number must be exactly 10 digits")
+    @Pattern(regexp = "0\\d{9}", message = "Phone number must start with 0 and contain 10 digits")
+    private String phoneNumber;
+
+    @NotBlank(message = "Email is required")
+    @Size(min = 11, max = 255, message = "Username must be between 11 and 255 characters")
+    @Email
+    private String email;
 
     @NotBlank(message = "Password can't blank")
     @Size(min = 6, max = 255, message = "Password must be between 6 and 255 characters")

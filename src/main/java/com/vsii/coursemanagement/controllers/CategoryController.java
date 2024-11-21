@@ -28,7 +28,7 @@ import java.util.List;
  */
 
 @RestController
-@RequestMapping("${api.prefix}/categories")
+@RequestMapping("${api.prefix}categories")
 @RequiredArgsConstructor
 @Tag(name = "Category Controller", description = "APIs for managing categories")
 @Slf4j
@@ -43,7 +43,7 @@ public class CategoryController {
             @ApiResponse(responseCode = "404", description = "URL not found"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    @GetMapping
+    @GetMapping("")
     public ResponseEntity<?> getAllCategories() throws DataNotFoundException {
         List<Category> categories = categoryService.getAllCategories();
 
