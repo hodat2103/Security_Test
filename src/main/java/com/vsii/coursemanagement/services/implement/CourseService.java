@@ -146,9 +146,10 @@ public class CourseService implements ICourseService {
     @Override
     public Page<CourseResponse> getAllCourses(String keyword, Long fieldId, Long languageId, Long instructorId, PageRequest pageRequest) throws DataNotFoundException {
 
-            Page<Course> coursePage = courseRepository.searchCourses(fieldId, languageId,instructorId, keyword, pageRequest);
-            Page<CourseResponse> courses = coursePage.map(CourseResponse::fromCourse);
-            if (courses.isEmpty()) {
+        Page<Course> coursePage = courseRepository.searchCourses(fieldId, languageId, instructorId, keyword, pageRequest);
+        Page<CourseResponse> courses = coursePage.map(CourseResponse::fromCourse);
+
+        if (courses.isEmpty()) {
                 // tra ve voi ma 204 khong co du lieu
                 throw new DataNotFoundException(Translator.toLocale(MessageKey.NO_COURSES_FOUND));
             }

@@ -1,5 +1,7 @@
 package com.vsii.coursemanagement.components;
 
+import com.nimbusds.jwt.JWTClaimsSet;
+import com.vsii.coursemanagement.configurations.TokenManager;
 import com.vsii.coursemanagement.entities.Account;
 import com.vsii.coursemanagement.exceptions.InvalidParamException;
 import io.jsonwebtoken.Claims;
@@ -9,6 +11,7 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.io.Encoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -29,22 +32,33 @@ public class JwtTokenUtils {
 
     @Value("${jwt.secretKey}")
     private String secretKey;
-    public String generateToken(Account account){
-        Map<String, Objects> claims = new HashMap<>();
-//        this.generateSecretKey();
-//        try {
-            String token = Jwts.builder()
-                    .setClaims(claims)
-                    .setSubject(account.getUsername()) // authen user
-                    .setIssuedAt(new Date(System.currentTimeMillis()))
-                    .setExpiration(new Date(System.currentTimeMillis() + expiration * 1000L)) //set expiration for token
-                    .signWith(getSecretInKey(), SignatureAlgorithm.HS256) //sign token bay secretKey & algorithm HS256
-                    .compact();// create token by String char
-            return token;
-//        }catch (Exception e){
-//            throw new InvalidParamException("Cannot create token because error: " + e.getMessage());
-//        }
-//        return null;
+    @Autowired
+    private TokenManager tokenManager;
+    public String generateToken(Account account) throws Exception {
+//        Map<String, Objects> claims = new HashMap<>();
+////        this.generateSecretKey();
+////        try {
+//            String token = Jwts.builder()
+//                    .setClaims(claims)
+//                    .setSubject(account.getUsername()) // authen user
+//                    .setIssuedAt(new Date(System.currentTimeMillis()))
+//                    .setExpiration(new Date(System.currentTimeMillis() + expiration * 1000L)) //set expiration for token
+//                    .signWith(getSecretInKey(), SignatureAlgorithm.HS256) //sign token bay secretKey & algorithm HS256
+//                    .compact();// create token by String char
+//            return token;
+////        }catch (Exception e){
+////            throw new InvalidParamException("Cannot create token because error: " + e.getMessage());
+////        }
+////        return null;
+        JWTClaimsSet claimsInput = new JWTClaimsSet.Builder()
+                .subject("account_info")
+                .claim("phoneNumber", account.getPhoneNumber())
+                .issueTime(new Date())                     // Thời gian phát hành token.
+                .issuer("https://your-app.com")            // Ứng dụng phát hành token.
+                .expirationTime(new Date(System.currentTimeMillis() + expiration * 1000L)) // Thời hạn token (1 giờ).
+                .build();
+        String encryptedTokenString = tokenManager.toEncryptedToken(claimsInput);
+        return  encryptedTokenString;
     }
 
     private Key getSecretInKey() {
@@ -71,20 +85,26 @@ public class JwtTokenUtils {
         final Claims claims = this.extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
-    public boolean isTokenExpired(String token){
-        Date exprirationDate = this.extractClaims(token, Claims::getExpiration);
-        return exprirationDate.before(new Date());
+    public boolean isTokenExpired(String token) throws Exception {
+//        Date exprirationDate = this.extractClaims(token, Claims::getExpiration);
+//        return exprirationDate.before(new Date());
+
+        JWTClaimsSet claims = tokenManager.parseEncryptedToken(token);
+        Date expirationTime = claims.getExpirationTime();
+        return expirationTime != null && expirationTime.before(new Date());
     }
 
-    public String extractUsername(String token){
-        return extractClaims(token, Claims::getSubject);
+    public String extractUsername(String token) throws Exception {
+//        return extractClaims(token, Claims::getSubject);
+
+        JWTClaimsSet claims = tokenManager.parseEncryptedToken(token);
+        return (String) claims.getClaim("phoneNumber");
     }
+
     //check username & expiration Token
-    public boolean validateToken(String token, UserDetails userDetails){
+    public boolean validateToken(String token, UserDetails userDetails) throws Exception {
         String phoneNumber = extractUsername(token);
-
-        return (phoneNumber.equals(userDetails.getUsername())
-                && !isTokenExpired(token));
+        return (phoneNumber.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 }
 

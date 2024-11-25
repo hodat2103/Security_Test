@@ -28,17 +28,17 @@ public interface IRSAService {
      * @throws InvalidKeyException neu khoa khong hop le
      * @throws Exception bat loi chung cua method
      */
-    public String encryptMessage(String plainText) throws GeneralSecurityException;
+    public String encryptRSA(String plainText) throws InvalidKeyException,GeneralSecurityException, Exception;
 
     /**
      * Method: de giai ma thong diep da duoc ma hoa (public key) bang private key
      *
-     * @param encryptedMessage thong diep da ma hoa bang public key
+     * @param cipherText thong diep da ma hoa bang public key
      * @return tra ve plainText da duoc giai ma bang private key
      * @throws GeneralSecurityException neu xay ra cac loi ve bao mat van de voi ma hoa, giai ma hoac cac thao tac bao mat khac
      * @throws IllegalArgumentException neu loi va chuyen doi Base 84 khi dua thong tin da ma hoa vao khong hop le
      * @throws InvalidKeyException neu khoa khong hop le
      * @throws Exception bat loi chung cua method
      */
-    public String decryptMessage(String encryptedMessage) throws GeneralSecurityException;
+    public String decryptRSA(String cipherText) throws GeneralSecurityException,IllegalArgumentException,InvalidKeyException, Exception;
 }

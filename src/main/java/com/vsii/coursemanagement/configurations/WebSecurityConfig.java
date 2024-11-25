@@ -11,6 +11,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -39,6 +40,7 @@ public class WebSecurityConfig {
         return new String[] {
                 String.format("%saccounts/**", apiPrefix),
                 String.format("%srsa/**", apiPrefix),
+                String.format("%scomments", apiPrefix),
                 "/v2/api-docs",
                 "/v3/api-docs/**",
                 "/swagger-resources/**",
@@ -48,7 +50,15 @@ public class WebSecurityConfig {
     }
 
     /**
-     * Cấu hình bảo mật
+     * Cấu hình bảo mật cho ứng dụng, xác định cách thức xử lý các yêu cầu HTTP.
+     * - Tắt CSRF.
+     * - Cấu hình quyền truy cập cho từng URL.
+     * - Cấu hình chính sách session.
+     * - Thêm bộ lọc JWT để xác thực người dùng.
+     *
+     * @param http Đối tượng HttpSecurity để cấu hình bảo mật.
+     * @return SecurityFilterChain đối tượng cấu hình bảo mật hoàn chỉnh.
+     * @throws Exception nếu có lỗi khi cấu hình bảo mật.
      */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -72,6 +82,9 @@ public class WebSecurityConfig {
 
                     auth.anyRequest().authenticated();
                 })
+                // Force HTTPS for all requests
+//                .requiresChannel(channel -> channel.anyRequest().requiresSecure())
+                .sessionManagement((session) ->     session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
                 .authenticationProvider(authenticationProvider); // Đảm bảo provider được sử dụng
         return http.build();

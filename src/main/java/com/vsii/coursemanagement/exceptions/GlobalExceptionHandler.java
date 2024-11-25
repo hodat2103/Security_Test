@@ -2,6 +2,7 @@ package com.vsii.coursemanagement.exceptions;
 import com.vsii.coursemanagement.components.Translator;
 import com.vsii.coursemanagement.dtos.response.ResponseError;
 import com.vsii.coursemanagement.utils.MessageKey;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,6 +10,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import java.security.GeneralSecurityException;
@@ -88,7 +90,16 @@ public class GlobalExceptionHandler {
                 "A server error occurred: " + ex.getMessage());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(XSSServletException.class)
+    public ResponseError handleSQLException(HttpServletRequest request,
+                                            Exception ex){
+        ResponseError errorResponse = new ResponseError(HttpStatus.FORBIDDEN.value(),ex.getMessage());
+//
+//        errorResponse.setStatus();
+//        errorResponse.setMessage();
 
-
+        return errorResponse;
+    }
 }
 

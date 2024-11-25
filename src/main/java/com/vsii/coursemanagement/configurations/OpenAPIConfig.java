@@ -43,13 +43,13 @@ public class OpenAPIConfig {
                         .description("API documents")
                         .version(version)
                         .license(new License().name("Apache 2.0").url("https://springdoc.org")))
-                .addSecurityItem(new SecurityRequirement().addList("Bearer Token")) // Thêm yêu cầu bảo mật
+                .addSecurityItem(new SecurityRequirement().addList("Bearer Token"))
                 .components(new io.swagger.v3.oas.models.Components()
                         .addSecuritySchemes("Bearer Token", new SecurityScheme()
                                 .name("Authorization")
                                 .type(SecurityScheme.Type.HTTP)
                                 .scheme("bearer")
-                                .bearerFormat("JWT"))); // Cấu hình Bearer Token
+                                .bearerFormat("JWT"))); // config Bearer Token
     }
 
 }

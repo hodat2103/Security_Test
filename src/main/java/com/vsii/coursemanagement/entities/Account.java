@@ -30,9 +30,9 @@ public class Account extends BaseEntity implements UserDetails, Serializable {
     @Column(name = "phone_number", length = 10, unique = true)
     private String phoneNumber;
 
-    @Email
-    @Column(name = "email", length = 255, unique = true)
-    @Convert(converter = AESEncryptionConfig.class)
+//    @Email
+    @Column(name = "email")
+//    @Convert(converter = AESEncryptionConfig.class)
     private String email;
 
     @Column(name = "password", length = 255)

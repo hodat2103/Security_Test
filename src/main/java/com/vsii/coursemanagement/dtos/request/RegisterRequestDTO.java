@@ -18,7 +18,7 @@ public class RegisterRequestDTO {
     private String phoneNumber;
 
     @NotBlank(message = "Email is required")
-    @Size(min = 11, max = 255, message = "Username must be between 11 and 255 characters")
+//    @Size(min = 11, max = 255, message = "Username must be between 11 and 255 characters")
     @Email
     private String email;
 
@@ -31,7 +31,7 @@ public class RegisterRequestDTO {
     private String retypePassword;
 
     @JsonProperty("role_id")
-    @Min(value = 1, message = "Role Id must be positive integer")
+    @Min(value = 0, message = "Role Id must be positive integer")
     private Long roleId;
 
 }

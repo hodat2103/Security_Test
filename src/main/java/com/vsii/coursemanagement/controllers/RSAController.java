@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.GeneralSecurityException;
+import java.security.InvalidKeyException;
 
 @RestController
 @RequiredArgsConstructor
@@ -20,13 +21,13 @@ public class RSAController {
     }
 
     @PostMapping("/encrypt")
-    public String encryptMessage(@RequestBody String plainString) throws GeneralSecurityException {
-        return rsaService.encryptMessage(plainString);
+    public String encryptMessage(@RequestBody String plainString) throws Exception {
+        return rsaService.encryptRSA(plainString);
     }
 
 
     @PostMapping("/decrypt")
-    public String decryptMessage(@RequestBody String encryptString) throws GeneralSecurityException {
-        return rsaService.decryptMessage(encryptString);
+    public String decryptMessage(@RequestBody String cipherString) throws Exception {
+        return rsaService.decryptRSA(cipherString);
     }
 }

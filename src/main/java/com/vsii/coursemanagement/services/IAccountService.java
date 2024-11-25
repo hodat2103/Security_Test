@@ -1,6 +1,7 @@
 package com.vsii.coursemanagement.services;
 
 import com.vsii.coursemanagement.dtos.request.RegisterRequestDTO;
+import com.vsii.coursemanagement.dtos.response.data.AccountResponse;
 import com.vsii.coursemanagement.entities.Account;
 import com.vsii.coursemanagement.exceptions.DataNotFoundException;
 import com.vsii.coursemanagement.exceptions.InvalidParamException;
@@ -8,6 +9,8 @@ import com.vsii.coursemanagement.exceptions.PermissionDenyException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+
+import java.security.GeneralSecurityException;
 
 /**
  * IService nay chua cac method public voi muc dich chua cac method de phan chia cac cong viec lien quan den tai khoan nguoi dung
@@ -24,7 +27,7 @@ public interface IAccountService {
      * @throws DataNotFoundException khi khong tim thay role_name theo role_id
      * @throws DataIntegrityViolationException khi khong ton tai sdt trong database
      */
-    public Account register(RegisterRequestDTO registerRequestDTO) throws PermissionDenyException,DataNotFoundException,DataIntegrityViolationException;
+    public Account register(RegisterRequestDTO registerRequestDTO) throws PermissionDenyException, DataNotFoundException, DataIntegrityViolationException, GeneralSecurityException, Exception;
 
     /**
      * Method dang nhap tai khoan nguoi dung
@@ -33,14 +36,14 @@ public interface IAccountService {
      * @return token moi tao duoc
      * @throws DataNotFoundException khi khong tim thay tai khoan trong DB hoac tai khoan nay khong hoat dong nua
      */
-    public String login(String phoneNumber, String password) throws DataNotFoundException;
+    public String login(String phoneNumber, String password) throws Exception;
 
 //    public UserDetails loadUserByPhoneNumber(String username);
     /**
      * Method tim account theo id
-     * @param id cua account
+     * @param phoneNumber cua account
      * @return tra ve 1 object account theo id
      * @throws DataNotFoundException khi khong tim thay account theo id yeu cau
      */
-    public Account getAccountById(Long id) throws DataNotFoundException;
+    public AccountResponse getAccountById(String phoneNumber) throws DataNotFoundException, GeneralSecurityException, Exception;
 }

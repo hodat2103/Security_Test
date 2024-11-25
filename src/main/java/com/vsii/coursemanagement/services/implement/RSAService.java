@@ -21,7 +21,9 @@ import java.util.Map;
 public class RSAService implements IRSAService {
     private static final String PUBLIC_KEY_FILE = "publicKey.pem";
     private static final String PRIVATE_KEY_FILE = "privateKey.pem";
-
+    private static final int KEY_SIZE = 4096;
+    private static final String ALGORITHM = "RSA";
+    private static final String TRANSFORMATION_CIPHER = "RSA/ECB/OAEPWITHSHA-256ANDMGF1PADDING";
     private static final Map<String, Object> map = new HashMap<>();
 
     @PostConstruct
@@ -46,8 +48,8 @@ public class RSAService implements IRSAService {
     @Override
     public void createKeys() {
         try {
-            KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
-            keyPairGenerator.initialize(4096);
+            KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(ALGORITHM);
+            keyPairGenerator.initialize(KEY_SIZE);
             KeyPair keyPair = keyPairGenerator.generateKeyPair();
 
             PublicKey publicKey = keyPair.getPublic();
@@ -77,21 +79,21 @@ public class RSAService implements IRSAService {
     private PublicKey loadPublicKey(String fileName) throws Exception {
         byte[] keyBytes = Base64.getDecoder().decode(Files.readAllBytes(Paths.get(fileName)));
         X509EncodedKeySpec spec = new X509EncodedKeySpec(keyBytes);
-        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+        KeyFactory keyFactory = KeyFactory.getInstance(ALGORITHM);
         return keyFactory.generatePublic(spec);
     }
 
     private PrivateKey loadPrivateKey(String fileName) throws Exception {
         byte[] keyBytes = Base64.getDecoder().decode(Files.readAllBytes(Paths.get(fileName)));
         PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(keyBytes);
-        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+        KeyFactory keyFactory = KeyFactory.getInstance(ALGORITHM);
         return keyFactory.generatePrivate(spec);
     }
 
     @Override
-    public String encryptMessage(String plainText) throws GeneralSecurityException {
+    public String encryptRSA(String plainText) throws InvalidKeyException,GeneralSecurityException,Exception {
         try {
-            Cipher cipher = Cipher.getInstance("RSA/ECB/OAEPWITHSHA-512ANDMGF1PADDING");
+            Cipher cipher = Cipher.getInstance(TRANSFORMATION_CIPHER);
             PublicKey publicKey = (PublicKey) map.get("publicKey");
             cipher.init(Cipher.ENCRYPT_MODE, publicKey);
 
@@ -110,13 +112,16 @@ public class RSAService implements IRSAService {
     }
 
     @Override
-    public String decryptMessage(String encryptedMessage) throws GeneralSecurityException {
+    public String decryptRSA(String cipherText) throws IllegalArgumentException,InvalidKeyException,GeneralSecurityException,Exception {
         try {
+            if(cipherText == null){
+                throw new NullPointerException("Cipher must not be null");
+            }
             // guaranteeing string valid in the code table Base 64
-            encryptedMessage = encryptedMessage.replaceAll("[^A-Za-z0-9+/=]", "");
-            byte[] decodedBytes = Base64.getDecoder().decode(encryptedMessage);
+            cipherText = cipherText.replaceAll("[^A-Za-z0-9+/=]", "");
+            byte[] decodedBytes = Base64.getDecoder().decode(cipherText);
 
-            Cipher cipher = Cipher.getInstance("RSA/ECB/OAEPWITHSHA-512ANDMGF1PADDING");
+            Cipher cipher = Cipher.getInstance(TRANSFORMATION_CIPHER);
             PrivateKey privateKey = (PrivateKey) map.get("privateKey");
             cipher.init(Cipher.DECRYPT_MODE, privateKey);
 
