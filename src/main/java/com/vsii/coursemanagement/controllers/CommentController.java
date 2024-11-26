@@ -10,9 +10,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("${api.prefix}comments")
 public class CommentController {
 
-    @Autowired
-    private XSSUtils xssSanitizer;
-
     @PostMapping
     public String saveComment(@RequestBody String comment) {
 
