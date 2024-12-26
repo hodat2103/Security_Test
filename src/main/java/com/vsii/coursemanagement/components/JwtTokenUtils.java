@@ -53,9 +53,9 @@ public class JwtTokenUtils {
         JWTClaimsSet claimsInput = new JWTClaimsSet.Builder()
                 .subject("account_info")
                 .claim("phoneNumber", account.getPhoneNumber())
-                .issueTime(new Date())                     // Thời gian phát hành token.
-                .issuer("https://your-app.com")            // Ứng dụng phát hành token.
-                .expirationTime(new Date(System.currentTimeMillis() + expiration * 1000L)) // Thời hạn token (1 giờ).
+                .issueTime(new Date())                     // Time issue token.
+                .issuer("https://your-app.com")            // App issue token.
+                .expirationTime(new Date(System.currentTimeMillis() + expiration * 1000L)) // expiration token (1 hour).
                 .build();
         String encryptedTokenString = tokenManager.toEncryptedToken(claimsInput);
         return  encryptedTokenString;

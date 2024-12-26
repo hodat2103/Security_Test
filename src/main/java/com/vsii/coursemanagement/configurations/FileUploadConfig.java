@@ -8,8 +8,8 @@ import org.springframework.boot.web.servlet.MultipartConfigFactory;
 import org.springframework.util.unit.DataSize;
 
 /**
- * duoc danh dau la lop cau hinh
- * dung de config cac file upload khong vuot qua 100MB
+ * This class marked configuration
+ * Use to config the upload files not exceed 100MB
  */
 @Configuration
 public class FileUploadConfig {

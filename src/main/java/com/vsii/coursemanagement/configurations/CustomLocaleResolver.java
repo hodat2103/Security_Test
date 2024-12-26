@@ -12,8 +12,8 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * duoc danh dau la configuration
- * su dung de cau hinh ngon ngu,
+ * This class marked configuration
+ * Use to config the language,
  */
 @Configuration
 public class CustomLocaleResolver extends AcceptHeaderLocaleResolver implements WebMvcConfigurer {

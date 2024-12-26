@@ -86,4 +86,4 @@ main:
     level:
       org.springframework.security: DEBUG
       org.springframework.web: DEBUG
-#      logging.level.com.project.CourseSellingWeb.filters.JwtTokenFilter: DEBUG
+      com.project.CourseSellingWeb.filters.JwtTokenFilter: DEBUG

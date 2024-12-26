@@ -6,10 +6,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Class nay duoc danh dau la Configuration dung de cau hinh cloudinary (them phu thuoc trong pom.xml)
- * chua cac cloud_name: ma cua nguoi dung tren cloudinary
+ * Class marked is Configuration used to config cloudinary (add dependency in file pom.xml)
+ * Contains cloud_name: user's code in the cloudinary
  *          api_key
- *          api_secret: hai api nay de xac minh quyen truy cap vao cloudinary nguoi dung
+ *          api_secret: APIs to verify the access permission to user's cloudinary
  */
 @Configuration
 public class CloudinaryConfig {
@@ -18,7 +18,7 @@ public class CloudinaryConfig {
     private final String API_SECRET = "Dg6X56CPDjlU9pNRXvty1tNWBLU";
 
     /**
-     * truyen vao cac thong tin de co the truy cap vao cloudinary
+     * Transfer into information to access the cloudinary
      * @return
      */
     public Cloudinary cloudinary(){

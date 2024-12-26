@@ -7,19 +7,19 @@ import org.springframework.stereotype.Component;
 
 import java.util.Locale;
 /**
- * class Translator dung de lay thong diep tu file properties dua tren ma  (message code)
- * va su dung ngon ngu hien tai (locale) cua he thong   .
- * Class ho tro da ngon ngu cho ung dung (i18n), cho phep tra ve tuy theo ngon ngu duoc lua chonj
+ * class Translator use tp retrieve message from file properties based on message code
+ * This class will use the currently language (locale) of system.
+ * Class support multilingual for system (i18n), allow return elective  depending on the selected language
  */
 @Component
 public class Translator {
 
-    // doc cac file properties or yaml
+    // read files properties or yaml
     private static ResourceBundleMessageSource messageSource;
 
     /**
-     *  su dung constructor de truyen vao doi tuong
-     * @param messageSource nhan ma thong diep
+     *  Using constructor to transfer into object
+     * @param messageSource receive message
      */
     private Translator(@Autowired ResourceBundleMessageSource messageSource) {
         Translator.messageSource = messageSource;
@@ -27,14 +27,13 @@ public class Translator {
 
 
     /**
-     * lay thong diep tu file properties du tren ma message code va su dung ngon ngu hien tai cua he thong dax chonj
-     * @param msgCode - ma thong diep
-     * @return thong diep se tra ve theo ngon ngu da chon neu khong thi return null
-     * khong chon thi mac dinh se la tieng anh
+     * Retrieve from file properties based on message code, and it's use the currently language of the selected system
+     * @param msgCode - message
+     * @return message returned depending on the language selected if not returned null
+     * If not selected so the default is US
      */
     public static String toLocale(String msgCode, Object... args) {
         Locale locale = LocaleContextHolder.getLocale();
-        String message = messageSource.getMessage(msgCode, args, locale);
-        return message;
+        return messageSource.getMessage(msgCode, args, locale);
     }
 }

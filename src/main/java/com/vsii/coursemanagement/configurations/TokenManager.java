@@ -20,11 +20,11 @@ public class TokenManager {
     private final SecretKey encryptionKey; // AES used to encrypt JWT signed
 
     /**
-     * Tạo một token JWT đã ký và mã hóa.
+     * Create a token JWT signed, and encrypt.
      *
-     * @param claims Dữ liệu payload chứa các tuyên bố JWT.
-     * @return Chuỗi JWT đã ký và mã hóa.
-     * @throws Exception Nếu xảy ra lỗi trong quá trình ký hoặc mã hóa.
+     * @param claims: Payload data contains the JWT declares .
+     * @return Chain JWT signed and encrypt.
+     * @throws Exception If it occurs the error in the signing or encryption process.
      */
     public String toEncryptedToken(JWTClaimsSet claims) throws Exception {
 //        System.out.println(encryptionKey);
@@ -58,11 +58,11 @@ public class TokenManager {
 
 
     /**
-     * Phân tích và xác thực token JWT đã ký và mã hóa.
+     * Analyst and authenticate token JWT signed nad encrypt.
      *
-     * @param encryptedToken Chuỗi JWT đã mã hóa.
-     * @return Các tuyên bố JWT (JWTClaimsSet) sau khi xác thực.
-     * @throws Exception Nếu chữ ký không hợp lệ hoặc xảy ra lỗi khi giải mã.
+     * @param encryptedToken Chain JWT encrypted.
+     * @return The statement JWT (JWTClaimsSet) after authenticated.
+     * @throws Exception If the sign not valid or occurs the error while decrypting.
      */
     public JWTClaimsSet parseEncryptedToken(String encryptedToken) throws Exception {
 //        System.out.println(encryptionKey);

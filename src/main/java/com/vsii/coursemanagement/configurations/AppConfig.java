@@ -11,8 +11,8 @@ import org.springframework.web.filter.CorsFilter;
 public class AppConfig {
 
     /**
-     * cau hinh CORS cho phep cac yeu cau duoc viec cho phep truy cap tren cac localhost de tuong tac
-     * @return tra ve kieu Bean de cau hinh cho CORS
+     * Configuration CORS allow the requests access on the localhost to interactive
+     * @return Returned type Bean to config for CORS
      */
     @Bean
     public FilterRegistrationBean<CorsFilter> corsFilter() {

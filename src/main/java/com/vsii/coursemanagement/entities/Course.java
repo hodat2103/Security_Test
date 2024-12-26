@@ -36,7 +36,6 @@ public class Course extends BaseEntity{
     @Column(name = "price")
     private BigDecimal price; // gia cua khoa hoc
 
-
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "category_id")
     private Category category; // danh muc bao gom nhu (Backend, Frontend, Devops,...)
